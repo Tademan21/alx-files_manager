@@ -82,6 +82,7 @@ class UsersController {
       return;
     }
     const users = dbClient.db.collection('users');
+    console.log(user);
     const userDoc = await users.findOne({
       _id: user,
     });
