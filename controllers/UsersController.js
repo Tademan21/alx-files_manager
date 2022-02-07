@@ -1,6 +1,9 @@
 import {
   createHash,
 } from 'crypto';
+import {
+  ObjectId,
+} from 'mongodb';
 import dbClient from '../utils/db';
 import redisClient from '../utils/redis';
 
@@ -52,7 +55,6 @@ class UsersController {
       email,
       password: hash,
     });
-    console.log(newUser);
     const json = {
       id: newUser.insertedId,
       email,
@@ -83,9 +85,8 @@ class UsersController {
       return;
     }
     const users = dbClient.db.collection('users');
-    console.log(user);
     const userDoc = await users.findOne({
-      _id: user,
+      _id: ObjectId(user),
     });
     if (!userDoc) {
       res.status(401).send({
