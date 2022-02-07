@@ -10,11 +10,11 @@ class DBClient {
     this.host = env.DB_HOST || 'localhost';
     this.port = env.DB_PORT || 27017;
     this.dbName = env.DB_DATABASE || 'files_manager';
-    this.client = new MongoClient(`mongodb://${this.host}:${this.port}`, {
+    MongoClient(`mongodb://${this.host}:${this.port}`, {
       useNewUrlParser: true,
       useUnifiedTopology: true,
-    });
-    this.client.connect().then(() => {
+    }).connect().then((client) => {
+      this.client = client;
       this.db = this.client.db(this.dbName);
     }).catch((err) => {
       console.error(err.message);
@@ -22,7 +22,8 @@ class DBClient {
   }
 
   isAlive() {
-    return this.client.isConnected();
+    if (this.db) return true;
+    return false;
   }
 
   async nbUsers() {
