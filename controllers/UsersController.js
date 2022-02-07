@@ -81,11 +81,16 @@ class UsersController {
       });
       return;
     }
-    console.log(user);
     const users = dbClient.db.collection('users');
     const userDoc = await users.findOne({
       _id: user,
     });
+    if (!userDoc) {
+      res.status(401).send({
+        error: 'Unauthorized',
+      });
+      return;
+    }
     res.status(200).send({
       id: userDoc._id,
       email: userDoc.email,
