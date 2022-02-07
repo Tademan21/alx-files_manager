@@ -66,6 +66,7 @@ class Authorization {
       res.status(401).send({
         error: 'Missing authorization token',
       });
+      return;
     }
     authToken = `auth_${authToken}`;
     const user = await redisClient.get(authToken);
@@ -73,6 +74,7 @@ class Authorization {
       res.status(401).send({
         error: 'Unauthorized',
       });
+      return;
     }
     await redisClient.del(authToken);
     res.status(204).send();
