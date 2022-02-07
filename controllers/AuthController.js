@@ -69,6 +69,7 @@ class Authorization {
       return;
     }
     authToken = `auth_${authToken}`;
+    console.log(authToken);
     const user = await redisClient.get(authToken);
     if (!user) {
       res.status(401).send({
@@ -99,6 +100,7 @@ class Authorization {
       res.status(401).send({
         error: 'Unauthorized',
       });
+      return;
     }
     res.status(200).send({
       user,
