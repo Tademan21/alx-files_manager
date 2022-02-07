@@ -69,7 +69,6 @@ class Authorization {
       return;
     }
     authToken = `auth_${authToken}`;
-    console.log(authToken);
     const user = await redisClient.get(authToken);
     if (!user) {
       res.status(401).send({
@@ -79,32 +78,6 @@ class Authorization {
     }
     await redisClient.del(authToken);
     res.status(204).send();
-  }
-
-  /**
-   * @param {object} req
-   * @param {object} res
-   * @returns {object} user
-   * @description This method retrieves user data based on user based token
-   */
-  static async getUser(req, res) {
-    let authToken = req.headers['X-Token'];
-    if (!authToken) {
-      res.status(401).send({
-        error: 'Missing authorization token',
-      });
-    }
-    authToken = `auth_${authToken}`;
-    const user = await redisClient.get(authToken);
-    if (!user) {
-      res.status(401).send({
-        error: 'Unauthorized',
-      });
-      return;
-    }
-    res.status(200).send({
-      user,
-    });
   }
 }
 
