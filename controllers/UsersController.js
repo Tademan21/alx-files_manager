@@ -66,16 +66,16 @@ class UsersController {
    * @description This method retrieves user data based on user based token
    */
   static async getMe(req, res) {
-    let authToken = req.headers['x-token'];
+    const authToken = req.headers['x-token'];
     if (!authToken) {
       res.status(401).send({
         error: 'Unauthorized',
       });
       return;
     }
-    authToken = `auth_${authToken}`;
-    const user = await redisClient.get(authToken);
-    console.log(user);
+    const token = `auth_${authToken}`;
+    console.log(token);
+    const user = await redisClient.get(token);
     if (!user) {
       res.status(401).send({
         error: 'Unauthorized',
