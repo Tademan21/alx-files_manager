@@ -74,7 +74,6 @@ class UsersController {
       return;
     }
     const token = `auth_${authToken}`;
-    console.log(token);
     const user = await redisClient.get(token);
     if (!user) {
       res.status(401).send({
@@ -82,7 +81,7 @@ class UsersController {
       });
       return;
     }
-
+    console.log(user);
     const users = dbClient.db.collection('users');
     const userDoc = await users.findOne({
       _id: user,
