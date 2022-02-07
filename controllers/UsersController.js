@@ -52,6 +52,7 @@ class UsersController {
       email,
       password: hash,
     });
+    console.log(newUser);
     const json = {
       id: newUser.insertedId,
       email,
