@@ -374,8 +374,18 @@ class FilesController {
         error: 'Not found',
       });
     } else {
-      const mimeType = mime.lookup(file.localPath);
-      res.contentType(mimeType).sendFile(file.localPath);
+      // read file with fs
+      fs.readFile(file.localPath, 'utf8', (err, data) => {
+        if (err) {
+          res.status(500).send({
+            error: 'Internal server error',
+          });
+        }
+        // const encodedData = Buffer.from(data).toString('base64');
+        // res.contentType(mimeType).sendFile(file.localPath);
+        const mimeType = mime.lookup(file.localPath);
+        res.contentType(mimeType).status(200).send(data);
+      });
     }
   }
 
