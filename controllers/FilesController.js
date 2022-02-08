@@ -330,6 +330,7 @@ class FilesController {
       });
       updatedFile.id = updatedFile._id;
       delete updatedFile._id;
+      delete updatedFile.localPath;
       res.status(200).send(updatedFile);
     }
   }
@@ -373,7 +374,7 @@ class FilesController {
         error: 'Not found',
       });
     } else {
-      const mimeType = mime.lookup(path.extname(file.localPath));
+      const mimeType = mime.lookup(file.localPath);
       res.contentType(mimeType).sendFile(file.localPath);
     }
   }
