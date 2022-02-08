@@ -27,7 +27,7 @@ class FilesController {
    * @returns {Object} - Express response object
    */
   static async postUpload(req, res) {
-    const user = this.retrieveUserBasedOnToken(req);
+    const user = FilesController.retrieveUserBasedOnToken(req);
     if (!user) {
       res.status(401).send({
         error: 'Unauthorized',
@@ -148,7 +148,7 @@ class FilesController {
     const {
       id,
     } = req.params;
-    const user = this.retrieveUserBasedOnToken(req);
+    const user = FilesController.retrieveUserBasedOnToken(req);
     if (!user) {
       res.status(401).send({
         error: 'Unauthorized',
@@ -178,7 +178,7 @@ class FilesController {
    * @returns {Object} - Express response object
    */
   static async getIndex(req, res) {
-    const user = this.retrieveUserBasedOnToken(req);
+    const user = FilesController.retrieveUserBasedOnToken(req);
     if (!user) {
       res.status(401).send({
         error: 'Unauthorized',
@@ -263,11 +263,11 @@ class FilesController {
    * @param {Boolean} isPublic - isPublic value to set
    * @returns {Object} - Express response object
    */
-  async pubSubHelper(req, res, updateValue) {
+  static async pubSubHelper(req, res, updateValue) {
     const {
       id,
     } = req.params;
-    const user = this.retrieveUserBasedOnToken(req);
+    const user = FilesController.retrieveUserBasedOnToken(req);
     if (!user) {
       res.status(401).send({
         error: 'Unauthorized',
@@ -307,7 +307,7 @@ class FilesController {
     const {
       id,
     } = req.params;
-    const user = this.retrieveUserBasedOnToken(req);
+    const user = FilesController.retrieveUserBasedOnToken(req);
     if (!user) {
       res.status(401).send({
         error: 'Unauthorized',
