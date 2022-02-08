@@ -383,8 +383,7 @@ class FilesController {
           });
         }
         const encodedData = Buffer.from(data).toString('base64');
-        const mimeType = mime.lookup(file.name);
-        res.set('Content-Type', mimeType);
+        res.set('Content-Type', mime.lookup(file.name));
         res.status(200).send(encodedData);
       });
     }
