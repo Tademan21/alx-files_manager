@@ -100,7 +100,7 @@ class FilesController {
       const storeFolderPath = env.FOLDER_PATH || '/tmp/files_manager';
       const fileName = uuidv4();
       const filePath = `${storeFolderPath}/${fileName}`;
-      await fs.writeFile(filePath, data, 'utf-8');
+      await fs.writeFile(filePath, data);
       const files = dbClient.db.collection('files');
       const newFile = {
         name,
