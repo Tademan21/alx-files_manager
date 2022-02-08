@@ -102,6 +102,12 @@ class FilesController {
       const fileName = uuidv4();
       const filePath = `${storeFolderPath}/${fileName}`;
 
+      // Create directory if not exists
+      fs.access(storeFolderPath, fs.constants.F_OK, (err) => {
+        if (err) {
+          fs.mkdirSync(storeFolderPath);
+        }
+      });
       const file = fs.createWriteStream(filePath);
       file.write(data);
       file.end();
