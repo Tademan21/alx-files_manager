@@ -368,8 +368,10 @@ class FilesController {
       });
       return;
     }
+
     // check if file exists
     if (!(await FilesController.pathExists(file.localPath))) {
+      console.log('checking path exists');
       res.status(404).send({
         error: 'Not found',
       });
