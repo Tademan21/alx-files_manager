@@ -11,7 +11,19 @@ import fs from 'fs';
 import redisClient from '../utils/redis';
 import dbClient from '../utils/db';
 
+/**
+ * @class FilesController
+ * @description Controller for files related operations
+ * @exports FilesController
+ */
 class FilesController {
+  /**
+   * @method postUpload
+   * @description Uploads a file
+   * @param {Object} req - Express request object
+   * @param {Object} res - Express response object
+   * @returns {Object} - Express response object
+   */
   static async postUpload(req, res) {
     const user = this.retrieveUserBasedOnToken(req);
     if (!user) {
@@ -102,6 +114,13 @@ class FilesController {
     }
   }
 
+  /**
+   * @method retrieveUserBasedOnToken
+   * @description retrieve user based on auth token
+   * @param {Object} req - Express request object
+   * @param {Object} res - Express response object
+   * @returns {Object} - Express response object
+   */
   static async retrieveUserBasedOnToken(req) {
     const authToken = req.headers['x-token'];
     if (!authToken) return null;
@@ -116,6 +135,13 @@ class FilesController {
     return userDoc;
   }
 
+  /**
+   * @method getShow
+   * @description retrieve files based on id
+   * @param {Object} req - Express request object
+   * @param {Object} res - Express response object
+   * @returns {Object} - Express response object
+   */
   static async getShow(req, res) {
     const {
       id,
@@ -142,6 +168,13 @@ class FilesController {
     }
   }
 
+  /**
+   * @method getIndex
+   * @description retrieve files based on parentid and pagination
+   * @param {Object} req - Express request object
+   * @param {Object} res - Express response object
+   * @returns {Object} - Express response object
+   */
   static async getIndex(req, res) {
     const user = this.retrieveUserBasedOnToken(req);
     if (!user) {
@@ -198,9 +231,68 @@ class FilesController {
     res.send(result);
   }
 
-  // static putPublish(req, res) {}
+  /**
+   * @method putPublish
+   * @description set isPublic to true on the file document based on the ID
+   * @param {Object} req - Express request object
+   * @param {Object} res - Express response object
+   * @returns {Object} - Express response object
+   */
+  static putPublish(req, res) {
+    this.pubSubHelper(req, res, true);
+  }
 
-  // static putUnpublish(req, res) {}
+  /**
+   * @method putUnpublish
+   * @description set isPublic to false on the file document based on the ID
+   * @param {Object} req - Express request object
+   * @param {Object} res - Express response object
+   * @returns {Object} - Express response object
+   */
+  static putUnpublish(req, res) {
+    this.pubSubHelper(req, res, false);
+  }
+
+  /**
+   * @method pubSubHelper
+   * @description helper method for @putPublish and @putUnpublish
+   * @param {Object} req - Express request object
+   * @param {Object} res - Express response object
+   * @param {Boolean} isPublic - isPublic value to set
+   * @returns {Object} - Express response object
+   */
+  async pubSubHelper(req, res, updateValue) {
+    const {
+      id,
+    } = req.params;
+    const user = this.retrieveUserBasedOnToken(req);
+    if (!user) {
+      res.status(401).send({
+        error: 'Unauthorized',
+      });
+      return;
+    }
+    const files = dbClient.db.collection('files');
+    const file = await files.findOne({
+      userId: user._id,
+      _id: ObjectId(id),
+    });
+    if (!file) {
+      res.status(404).send({
+        error: 'Not found',
+      });
+    } else {
+      const update = {
+        $set: {
+          isPublic: updateValue,
+        },
+      };
+      const result = await files.updateOne({
+        _id: ObjectId(id),
+      }, update);
+      res.status(200).send(result);
+    }
+  }
 }
 
 export default FilesController;
