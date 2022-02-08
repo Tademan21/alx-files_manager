@@ -100,7 +100,7 @@ class FilesController {
     } else {
       const storeFolderPath = env.FOLDER_PATH || '/tmp/files_manager';
       const fileName = uuidv4();
-      const filePath = `${storeFolderPath}/${fileName}`;
+      const filePath = path.join(storeFolderPath, fileName);
 
       const newFile = {
         name,
@@ -111,8 +111,7 @@ class FilesController {
       };
       // add key to newFile depending on type
       if (type === 'file' || type === 'image') {
-        const absPath = path.join(storeFolderPath, fileName);
-        newFile.localPath = absPath;
+        newFile.localPath = filePath;
       }
       const decodedData = Buffer.from(data, 'base64');
 
@@ -143,6 +142,8 @@ class FilesController {
       ...newFile,
       id: result.insertedId,
     };
+    delete fres._id;
+    delete fres.localPath;
     res.status(201).send(fres);
   }
 
