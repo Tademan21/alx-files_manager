@@ -358,7 +358,7 @@ class FilesController {
       userId: user._id,
       _id: ObjectId(id),
     });
-    if (!file && file.isPublic !== false) {
+    if (!file || file.isPublic !== false) {
       res.status(404).send({
         error: 'Not found',
       });
@@ -381,11 +381,9 @@ class FilesController {
             error: 'Internal server error',
           });
         }
-        // const encodedData = Buffer.from(data).toString('base64');
-        // res.contentType(mimeType).sendFile(file.localPath);
+        const encodedData = Buffer.from(data).toString('base64');
         const mimeType = mime.lookup(file.localPath);
-        console.log(data);
-        res.contentType(mimeType).status(200).send(data);
+        res.contentType(mimeType).status(200).send(encodedData);
       });
     }
   }
