@@ -108,18 +108,31 @@ class FilesController {
         parentId: parentId || 0,
         isPublic: isPublic || false,
         userId,
-        localPath: filePath,
       };
+      // add key to newFile depending on type
+      if (type === 'file' || type === 'image') {
+        const absPath = path.join(storeFolderPath, fileName);
+        newFile.localPath = absPath;
+      }
+      const decodedData = Buffer.from(data, 'base64');
+
       // Create directory if not exists
       if (!(await FilesController.pathExists(storeFolderPath))) {
         await fs.mkdir(storeFolderPath, { recursive: true });
-        FilesController.writeToFile(res, filePath, data, newFile);
+        FilesController.writeToFile(res, filePath, decodedData, newFile);
       } else {
-        FilesController.writeToFile(res, filePath, data, newFile);
+        FilesController.writeToFile(res, filePath, decodedData, newFile);
       }
     }
   }
 
+  /**
+   * @method writeToFile
+   * @description Helper function of @postUpload that writes the file to the disk
+   * @param {Object} req - Express request object
+   * @param {Object} res - Express response object
+   * @returns {Object} - Express response object
+   */
   static async writeToFile(res, filePath, data, newFile) {
     const file = fs.createWriteStream(filePath);
     file.write(data);
@@ -344,21 +357,25 @@ class FilesController {
       res.status(400).send({
         error: 'A folder doesn\'t have content',
       });
-    } else {
-      // check if file exists
-      fs.access(file.localPath, fs.constants.F_OK, (err) => {
-        if (err) {
-          res.status(404).send({
-            error: 'Not found',
-          });
-        } else {
-          const mimeType = mime.lookup(path.extname(file.localPath));
-          res.contentType(mimeType).sendFile(file.localPath);
-        }
+      return;
+    }
+    // check if file exists
+    if (!(await FilesController.pathExists(file.localPath))) {
+      res.status(404).send({
+        error: 'Not found',
       });
+    } else {
+      const mimeType = mime.lookup(path.extname(file.localPath));
+      res.contentType(mimeType).sendFile(file.localPath);
     }
   }
 
+  /**
+   * @method pathExists
+   * @description check if the path exists
+   * @param {String} path - path to check
+   * @returns {Boolean} - true if path exists, false otherwise
+   */
   static pathExists(path) {
     return new Promise((resolve) => {
       fs.access(path, fs.constants.F_OK, (err) => {
