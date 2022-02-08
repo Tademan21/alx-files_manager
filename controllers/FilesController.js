@@ -131,13 +131,13 @@ class FilesController {
     file.end();
     const files = dbClient.db.collection('files');
     const result = await files.insertOne(newFile);
-    const fres = {
+    const writeResp = {
       ...newFile,
       id: result.insertedId,
     };
-    delete fres._id;
-    delete fres.localPath;
-    res.status(201).send(fres);
+    delete writeResp._id;
+    delete writeResp.localPath;
+    res.status(201).send(writeResp);
   }
 
   /**
@@ -223,6 +223,7 @@ class FilesController {
     });
     if (!parentFolder) {
       res.send([]);
+      return;
     }
 
     // Perform pagination
