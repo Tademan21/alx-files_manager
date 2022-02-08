@@ -384,6 +384,7 @@ class FilesController {
         // const encodedData = Buffer.from(data).toString('base64');
         // res.contentType(mimeType).sendFile(file.localPath);
         const mimeType = mime.lookup(file.localPath);
+        console.log(data);
         res.contentType(mimeType).status(200).send(data);
       });
     }
