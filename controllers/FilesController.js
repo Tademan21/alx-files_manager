@@ -358,7 +358,7 @@ class FilesController {
       userId: user._id,
       _id: ObjectId(id),
     });
-    if (!file && file.isPublic === false) {
+    if (!file && file.isPublic !== false) {
       res.status(404).send({
         error: 'Not found',
       });
