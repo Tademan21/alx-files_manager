@@ -322,10 +322,15 @@ class FilesController {
           isPublic: updateValue,
         },
       };
-      const result = await files.updateOne({
+      await files.updateOne({
         _id: ObjectId(id),
       }, update);
-      res.status(200).send(result);
+      const updatedFile = await files.findOne({
+        _id: ObjectId(id),
+      });
+      updatedFile.id = updatedFile._id;
+      delete updatedFile._id;
+      res.status(200).send(updatedFile);
     }
   }
 
