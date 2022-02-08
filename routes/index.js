@@ -29,4 +29,7 @@ router.put('/files/:id/publish', FilesController.putUnpublish);
 router.post('/users', UsersController.postNew);
 router.get('/users/me', UsersController.getMe);
 
+// file content
+router.get('/files/:id/data', FilesController.getFile);
+
 export default router;

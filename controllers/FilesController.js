@@ -7,6 +7,8 @@ import {
 import {
   v4 as uuidv4,
 } from 'uuid';
+import path from 'path';
+import mime from 'mime-types';
 import fs from 'fs';
 import redisClient from '../utils/redis';
 import dbClient from '../utils/db';
@@ -291,6 +293,52 @@ class FilesController {
         _id: ObjectId(id),
       }, update);
       res.status(200).send(result);
+    }
+  }
+
+  /**
+   * @method getFile
+   * @description return the content of the file document based on the ID
+   * @param {Object} req - Express request object
+   * @param {Object} res - Express response object
+   * @returns {Object} - Express response object
+   */
+  static async getFile(req, res) {
+    const {
+      id,
+    } = req.params;
+    const user = this.retrieveUserBasedOnToken(req);
+    if (!user) {
+      res.status(401).send({
+        error: 'Unauthorized',
+      });
+      return;
+    }
+    const files = dbClient.db.collection('files');
+    const file = await files.findOne({
+      userId: user._id,
+      _id: ObjectId(id),
+    });
+    if (!file && file.isPublic === false) {
+      res.status(404).send({
+        error: 'Not found',
+      });
+    } else if (file.type === 'folder') {
+      res.status(400).send({
+        error: 'A folder doesn\'t have content',
+      });
+    } else {
+      // check if file exists
+      fs.access(file.localPath, fs.constants.F_OK, (err) => {
+        if (err) {
+          res.status(404).send({
+            error: 'Not found',
+          });
+        } else {
+          const mimeType = mime.lookup(path.extname(file.localPath));
+          res.contentType(mimeType).sendFile(file.localPath);
+        }
+      });
     }
   }
 }
