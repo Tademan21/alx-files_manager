@@ -89,7 +89,7 @@ class FilesController {
       type,
       parentId: parentId || 0,
       isPublic: isPublic || false,
-      userId: user._id,
+      userId: user._id.toString(),
     };
     if (type === 'folder') {
       const files = dbClient.db.collection('files');
