@@ -274,7 +274,7 @@ class FilesController {
    * @returns {Object} - Express response object
    */
   static putPublish(req, res) {
-    this.pubSubHelper(req, res, true);
+    FilesController.pubSubHelper(req, res, true);
   }
 
   /**
@@ -285,7 +285,7 @@ class FilesController {
    * @returns {Object} - Express response object
    */
   static putUnpublish(req, res) {
-    this.pubSubHelper(req, res, false);
+    FilesController.pubSubHelper(req, res, false);
   }
 
   /**
