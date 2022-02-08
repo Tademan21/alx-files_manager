@@ -10,6 +10,7 @@ import {
 import path from 'path';
 import mime from 'mime-types';
 import fs from 'fs';
+// import { promisify } from 'util';
 import redisClient from '../utils/redis';
 import dbClient from '../utils/db';
 
@@ -101,26 +102,21 @@ class FilesController {
       const fileName = uuidv4();
       const filePath = `${storeFolderPath}/${fileName}`;
 
-      fs.writeFile(filePath, data, 'utf-8', async (err) => {
-        if (err) {
-          res.status(500).send({
-            error: err.message,
-          });
-          return;
-        }
-        const files = dbClient.db.collection('files');
-        const newFile = {
-          name,
-          type,
-          parentId: parentId || 0,
-          isPublic: isPublic || false,
-          userId,
-          localPath: filePath,
-        };
-        const result = await files.insertOne(newFile);
-        newFile.id = result.insertedId;
-        res.status(201).send(newFile);
-      });
+      const file = fs.createWriteStream(filePath);
+      file.write(data);
+      file.end();
+      const files = dbClient.db.collection('files');
+      const newFile = {
+        name,
+        type,
+        parentId: parentId || 0,
+        isPublic: isPublic || false,
+        userId,
+        localPath: filePath,
+      };
+      const result = await files.insertOne(newFile);
+      newFile.id = result.insertedId;
+      res.status(201).send(newFile);
     }
   }
 
