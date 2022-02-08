@@ -104,7 +104,7 @@ class FilesController {
       fs.writeFile(filePath, data, 'utf-8', async (err) => {
         if (err) {
           res.status(500).send({
-            error: 'Error while saving file',
+            error: err.message,
           });
           return;
         }
