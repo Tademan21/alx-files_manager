@@ -382,9 +382,9 @@ class FilesController {
             error: 'Internal server error',
           });
         }
-        const encodedData = Buffer.from(data).toString('base64');
+        // const encodedData = Buffer.from(data).toString('base64');
         res.set('Content-Type', mime.lookup(file.name));
-        res.status(200).send(encodedData);
+        res.status(200).send(data);
       });
     }
   }
