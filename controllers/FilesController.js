@@ -100,19 +100,21 @@ class FilesController {
       const storeFolderPath = env.FOLDER_PATH || '/tmp/files_manager';
       const fileName = uuidv4();
       const filePath = `${storeFolderPath}/${fileName}`;
-      await fs.writeFile(filePath, data);
-      const files = dbClient.db.collection('files');
-      const newFile = {
-        name,
-        type,
-        parentId: parentId || 0,
-        isPublic: isPublic || false,
-        userId,
-        localPath: filePath,
-      };
-      const result = await files.insertOne(newFile);
-      newFile.id = result.insertedId;
-      res.status(201).send(newFile);
+
+      fs.writeFile(filePath, data, 'utf-8').then(async () => {
+        const files = dbClient.db.collection('files');
+        const newFile = {
+          name,
+          type,
+          parentId: parentId || 0,
+          isPublic: isPublic || false,
+          userId,
+          localPath: filePath,
+        };
+        const result = await files.insertOne(newFile);
+        newFile.id = result.insertedId;
+        res.status(201).send(newFile);
+      });
     }
   }
 
