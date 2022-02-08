@@ -225,18 +225,18 @@ class FilesController {
       return;
     }
     // Check for parent existence depending parent id
-    const parentFolder = await files.findOne({
-      _id: ObjectId(parentId),
-      userId: user._id,
-    });
-    if (!parentFolder) {
-      res.send([]);
-      return;
-    }
+    // const parentFolder = await files.findOne({
+    //   _id: ObjectId(parentId),
+    //   userId: user._id,
+    // });
+    // if (!parentFolder) {
+    //   res.send([]);
+    //   return;
+    // }
 
     // Perform pagination
     const pageSize = 20;
-    const skip = (page - 1) * pageSize;
+    const skip = ((page || 1) - 1) * pageSize;
 
     // Perform query
 
