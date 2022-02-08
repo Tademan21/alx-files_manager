@@ -91,7 +91,7 @@ class FilesController {
       isPublic: isPublic || false,
       userId: user._id,
     };
-    console.log(user._id);
+    console.log(user);
     if (type === 'folder') {
       const files = dbClient.db.collection('files');
       const result = await files.insertOne(newFile);
