@@ -215,13 +215,23 @@ class FilesController {
     } = req.query;
     const files = dbClient.db.collection('files');
 
-    // Check for parent existence dependingon user and type
+    // if parentId is not provided
+    if (!parentId) {
+      const result = await files.find({
+        userId: user._id,
+        parentId: 0,
+      }).toArray();
+      res.status(200).send(result);
+      return;
+    }
+    // Check for parent existence depending parent id
     const parentFolder = await files.findOne({
       _id: ObjectId(parentId),
       userId: user._id,
     });
     if (!parentFolder) {
       res.send([]);
+      return;
     }
 
     // Perform pagination
@@ -232,7 +242,7 @@ class FilesController {
 
     const query = {
       userId: user._id,
-      parentId: parentId || 0,
+      parentId,
     };
 
     // handle pagination using aggregation
