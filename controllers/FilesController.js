@@ -84,16 +84,16 @@ class FilesController {
       }
     }
 
-    const userId = user._id;
+    const newFile = {
+      name,
+      type,
+      parentId: parentId || 0,
+      isPublic: isPublic || false,
+      userId: user._id,
+    };
+    console.log(user._id);
     if (type === 'folder') {
       const files = dbClient.db.collection('files');
-      const newFile = {
-        name,
-        type,
-        parentId: parentId || 0,
-        isPublic: isPublic || false,
-        userId,
-      };
       const result = await files.insertOne(newFile);
       newFile.id = result.insertedId;
       res.status(201).send(newFile);
@@ -102,13 +102,6 @@ class FilesController {
       const fileName = uuidv4();
       const filePath = path.join(storeFolderPath, fileName);
 
-      const newFile = {
-        name,
-        type,
-        parentId: parentId || 0,
-        isPublic: isPublic || false,
-        userId,
-      };
       // add key to newFile depending on type
       if (type === 'file' || type === 'image') {
         newFile.localPath = filePath;
