@@ -10,6 +10,7 @@ import {
 import path from 'path';
 import mime from 'mime-types';
 import fs from 'fs';
+import { fsPromise } from 'fs/promises';
 // import { promisify } from 'util';
 import redisClient from '../utils/redis';
 import dbClient from '../utils/db';
@@ -101,28 +102,32 @@ class FilesController {
       const storeFolderPath = env.FOLDER_PATH || '/tmp/files_manager';
       const fileName = uuidv4();
       const filePath = `${storeFolderPath}/${fileName}`;
-
       // Create directory if not exists
-      fs.access(storeFolderPath, fs.constants.F_OK, (err) => {
-        if (err) {
-          fs.mkdirSync(storeFolderPath);
-        }
+      if (!(await FilesController.pathExists(storeFolderPath))) {
+        await fs.mkdir(storeFolderPath, { recursive: true });
+      }
+      // Write file
+      fsPromise.writeFile(filePath, data, 'base64').then(async () => {
+        const file = fs.createWriteStream(filePath);
+        file.write(data);
+        file.end();
+        const files = dbClient.db.collection('files');
+        const newFile = {
+          name,
+          type,
+          parentId: parentId || 0,
+          isPublic: isPublic || false,
+          userId,
+          localPath: filePath,
+        };
+        const result = await files.insertOne(newFile);
+        newFile.id = result.insertedId;
+        res.status(201).send(newFile);
+      }).catch((err) => {
+        res.status(500).send({
+          error: err.message,
+        });
       });
-      const file = fs.createWriteStream(filePath);
-      file.write(data);
-      file.end();
-      const files = dbClient.db.collection('files');
-      const newFile = {
-        name,
-        type,
-        parentId: parentId || 0,
-        isPublic: isPublic || false,
-        userId,
-        localPath: filePath,
-      };
-      const result = await files.insertOne(newFile);
-      newFile.id = result.insertedId;
-      res.status(201).send(newFile);
     }
   }
 
@@ -350,6 +355,14 @@ class FilesController {
         }
       });
     }
+  }
+
+  static pathExists(path) {
+    return new Promise((resolve) => {
+      fs.access(path, fs.constants.F_OK, (err) => {
+        resolve(!err);
+      });
+    });
   }
 }
 
