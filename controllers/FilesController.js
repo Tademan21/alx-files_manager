@@ -18,6 +18,7 @@ class FilesController {
       res.status(401).send({
         error: 'Unauthorized',
       });
+      return;
     }
     const acceptedTypes = ['folder', 'file', 'image'];
     const {
@@ -114,6 +115,92 @@ class FilesController {
     if (!userDoc) return null;
     return userDoc;
   }
+
+  static async getShow(req, res) {
+    const {
+      id,
+    } = req.params;
+    const user = this.retrieveUserBasedOnToken(req);
+    if (!user) {
+      res.status(401).send({
+        error: 'Unauthorized',
+      });
+      return;
+    }
+
+    const files = dbClient.db.collection('files');
+    const file = await files.findOne({
+      userId: user._id,
+      _id: ObjectId(id),
+    });
+    if (!file) {
+      res.status(404).send({
+        error: 'Not found',
+      });
+    } else {
+      res.status(200).send(file);
+    }
+  }
+
+  static async getIndex(req, res) {
+    const user = this.retrieveUserBasedOnToken(req);
+    if (!user) {
+      res.status(401).send({
+        error: 'Unauthorized',
+      });
+      return;
+    }
+    const {
+      parentId,
+      page,
+    } = req.query;
+    const files = dbClient.db.collection('files');
+
+    // Check for parent existence dependingon user and type
+    const parentFolder = await files.findOne({
+      _id: ObjectId(parentId),
+      userId: user._id,
+      type: 'folder',
+    });
+    if (!parentFolder) {
+      res.send([]);
+    }
+
+    // Perform pagination
+    const pageSize = 20;
+    const skip = (page - 1) * pageSize;
+
+    // Perform query
+
+    const query = {
+      userId: user._id,
+      parentId: parentId || 0,
+    };
+
+    // handle pagination using aggregation
+    const result = await files.aggregate([
+      {
+        $match: query,
+      },
+      {
+        $sort: {
+          name: 1,
+        },
+      },
+      {
+        $skip: skip,
+      },
+      {
+        $limit: pageSize,
+      },
+    ]).toArray();
+
+    res.send(result);
+  }
+
+  // static putPublish(req, res) {}
+
+  // static putUnpublish(req, res) {}
 }
 
 export default FilesController;
