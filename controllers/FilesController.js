@@ -28,7 +28,7 @@ class FilesController {
    * @returns {Object} - Express response object
    */
   static async postUpload(req, res) {
-    const user = FilesController.retrieveUserBasedOnToken(req);
+    const user = await FilesController.retrieveUserBasedOnToken(req);
     if (!user) {
       res.status(401).send({
         error: 'Unauthorized',
@@ -91,7 +91,6 @@ class FilesController {
       isPublic: isPublic || false,
       userId: user._id,
     };
-    console.log(user);
     if (type === 'folder') {
       const files = dbClient.db.collection('files');
       const result = await files.insertOne(newFile);
