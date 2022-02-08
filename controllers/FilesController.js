@@ -89,7 +89,7 @@ class FilesController {
       type,
       parentId: parentId || 0,
       isPublic: isPublic || false,
-      userId: user._id.toString(),
+      userId: user._id,
     };
     if (type === 'folder') {
       const files = dbClient.db.collection('files');
@@ -219,11 +219,9 @@ class FilesController {
     const parentFolder = await files.findOne({
       _id: ObjectId(parentId),
       userId: user._id,
-      type: 'folder',
     });
     if (!parentFolder) {
       res.send([]);
-      return;
     }
 
     // Perform pagination
