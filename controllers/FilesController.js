@@ -370,12 +370,7 @@ class FilesController {
     }
 
     // check if file exists
-    if (!(await FilesController.pathExists(file.localPath))) {
-      console.log('checking path exists');
-      res.status(404).send({
-        error: 'Not found',
-      });
-    } else {
+    if (fs.existsSync(file.localPath)) {
       // read file with fs
       fs.readFile(file.localPath, 'utf8', (err, data) => {
         if (err) {
@@ -386,6 +381,10 @@ class FilesController {
         const encodedData = Buffer.from(data).toString('base64');
         const mimeType = mime.lookup(file.localPath);
         res.contentType(mimeType).status(200).send(encodedData);
+      });
+    } else {
+      res.status(404).send({
+        error: 'Not found',
       });
     }
   }
