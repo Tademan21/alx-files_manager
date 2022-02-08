@@ -101,7 +101,13 @@ class FilesController {
       const fileName = uuidv4();
       const filePath = `${storeFolderPath}/${fileName}`;
 
-      fs.writeFile(filePath, data, 'utf-8').then(async () => {
+      fs.writeFile(filePath, data, 'utf-8', async (err) => {
+        if (err) {
+          res.status(500).send({
+            error: 'Error while saving file',
+          });
+          return;
+        }
         const files = dbClient.db.collection('files');
         const newFile = {
           name,
