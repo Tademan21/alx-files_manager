@@ -28,12 +28,14 @@ class DBClient {
 
   async nbUsers() {
     const collection = this.db.collection('users');
+    if (!collection) return 0;
     const nb = await collection.countDocuments();
     return nb;
   }
 
   async nbFiles() {
     const collection = this.db.collection('files');
+    if (!collection) return 0;
     const nb = await collection.countDocuments();
     return nb;
   }
