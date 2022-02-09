@@ -180,7 +180,7 @@ class FilesController {
     const files = dbClient.db.collection('files');
     const file = await files.findOne({
       _id: ObjectId(id),
-      userId: user._id.toString(),
+      userId: user._id,
     });
     if (!file) {
       res.status(404).send({
