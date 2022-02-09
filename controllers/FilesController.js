@@ -94,6 +94,8 @@ class FilesController {
       const files = dbClient.db.collection('files');
       const result = await files.insertOne(newFile);
       newFile.id = result.insertedId;
+      delete newFile._id;
+      res.setHeader('Content-Type', 'application/json');
       res.status(201).send(newFile);
     } else {
       const storeFolderPath = env.FOLDER_PATH || '/tmp/files_manager';
@@ -133,6 +135,7 @@ class FilesController {
     };
     delete writeResp._id;
     delete writeResp.localPath;
+    res.setHeader('Content-Type', 'application/json');
     res.status(201).send(writeResp);
   }
 
