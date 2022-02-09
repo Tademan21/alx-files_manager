@@ -93,7 +93,7 @@ class FilesController {
     if (type === 'folder') {
       const files = dbClient.db.collection('files');
       const result = await files.insertOne(newFile);
-      newFile.id = result.insertedId;
+      newFile.id = result._id;
       delete newFile._id;
       res.setHeader('Content-Type', 'application/json');
       res.status(201).send(newFile);
@@ -109,7 +109,8 @@ class FilesController {
       const decodedData = Buffer.from(data, 'base64');
 
       // Create directory if not exists
-      if (!(await FilesController.pathExists(storeFolderPath))) {
+      const pathExists = await FilesController.pathExists(storeFolderPath);
+      if (!pathExists) {
         await fs.mkdir(storeFolderPath, { recursive: true });
       }
       FilesController.writeToFile(res, filePath, decodedData, newFile);
@@ -361,7 +362,9 @@ class FilesController {
       res.status(404).send({
         error: 'Not found',
       });
-    } else if (file.type === 'folder') {
+      return;
+    }
+    if (file.type === 'folder') {
       res.status(400).send({
         error: 'A folder doesn\'t have content',
       });
