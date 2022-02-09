@@ -69,7 +69,7 @@ class UsersController {
    * @description This method retrieves user data based on user based token
    */
   static async getMe(req, res) {
-    const authToken = req.headers['x-token'];
+    const authToken = req.header('X-Token') || null;
     if (!authToken) {
       res.status(401).send({
         error: 'Unauthorized',

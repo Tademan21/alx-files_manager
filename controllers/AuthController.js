@@ -19,7 +19,7 @@ class Authorization {
    * @description This method creates a new user
    */
   static async getConnect(req, res) {
-    const authToken = req.headers.authorization;
+    const authToken = req.header('Authorization') || null;
     if (!authToken) {
       res.status(401).send({ error: 'Unauthorized' });
       return;
@@ -44,8 +44,7 @@ class Authorization {
       // generate new token
       const token = uuidv4();
       const key = `auth_${token}`;
-      const userID = user._id.toString();
-      await redisClient.set(key, userID, (60 * 60 * 24)); // 1 day
+      await redisClient.set(key, user._id.toString(), 86400); // 1 day
       res.status(200).send({
         token,
       });
@@ -63,7 +62,7 @@ class Authorization {
    * @description This method creates a new user
    */
   static async getDisconnect(req, res) {
-    let authToken = req.headers['x-token'];
+    let authToken = req.header('X-Token') || null;
     if (!authToken) {
       res.status(401).send({ error: 'Unauthorized' });
       return;
