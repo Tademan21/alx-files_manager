@@ -219,6 +219,7 @@ class FilesController {
     if (!parentId) {
       const result = await files.find({
         userId: user._id,
+        parentId: 0,
       }).toArray();
       res.status(200).send(result);
       return;
@@ -240,7 +241,7 @@ class FilesController {
     // Perform query
 
     const query = {
-      userId: user._id.toString(),
+      userId: user._id,
       parentId,
     };
 
@@ -248,11 +249,6 @@ class FilesController {
     const result = await files.aggregate([
       {
         $match: query,
-      },
-      {
-        $sort: {
-          name: 1,
-        },
       },
       {
         $skip: skip,
