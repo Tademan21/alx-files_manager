@@ -187,6 +187,8 @@ class FilesController {
         error: 'Not found',
       });
     } else {
+      file.id = file._id;
+      delete file._id;
       res.status(200).send(file);
     }
   }
