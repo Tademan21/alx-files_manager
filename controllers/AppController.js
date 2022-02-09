@@ -3,11 +3,12 @@ import dbClient from '../utils/db';
 
 class AppController {
   static getStatus(req, res) {
+    const redis = redisClient.isAlive();
+    const db = dbClient.isAlive();
     const json = {
-      redis: redisClient.isAlive(),
-      db: dbClient.isAlive(),
+      redis,
+      db,
     };
-    res.setHeader('Content-Type', 'application/json');
     res.status(200).send(json);
   }
 
@@ -18,7 +19,6 @@ class AppController {
       users,
       files,
     };
-    res.setHeader('Content-Type', 'application/json');
     res.status(200).send(json);
   }
 }
