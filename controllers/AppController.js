@@ -7,6 +7,7 @@ class AppController {
       redis: redisClient.isAlive(),
       db: dbClient.isAlive(),
     };
+    res.setHeader('Content-Type', 'application/json');
     res.status(200).send(json);
   }
 
@@ -17,6 +18,7 @@ class AppController {
       users,
       files,
     };
+    res.setHeader('Content-Type', 'application/json');
     res.status(200).send(json);
   }
 }
