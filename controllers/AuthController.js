@@ -24,6 +24,7 @@ class Authorization {
       res.status(401).send({
         error: 'Missing authorization token',
       });
+      return;
     }
 
     // decode authToken from base64 to utf8 to get email and password
