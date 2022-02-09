@@ -352,19 +352,10 @@ class FilesController {
     const file = await files.findOne({
       _id: ObjectId(id),
     });
-    if (!file) {
-      res.status(404).send({
-        error: 'Not found',
-      });
-      return;
-    }
-    if (!user && file.isPublic === false) {
-      res.status(404).send({
-        error: 'Not found',
-      });
-      return;
-    }
-    if (file.isPublic === false && file.userId !== user._id) {
+    // throw error if file doesn't exist or no user found and file isn't public
+    // or user doesn't own the file and is not public
+    if (!file || (!user && file.isPublic === false)
+      || (file.isPublic === false && file.userId !== user._id)) {
       res.status(404).send({
         error: 'Not found',
       });
@@ -378,16 +369,14 @@ class FilesController {
     }
 
     // check if file exists
-    if (!(await FilesController.pathExists(file.localPath))) {
+    const fileExists = await FilesController.fileExists(file.localPath);
+    if (fileExists) {
+      res.set('Content-Type', mime.lookup(file.name));
+      res.status(200).sendFile(file.localPath);
+    } else {
       res.status(404).send({
         error: 'Not found',
       });
-    } else {
-      // read file with fs
-      // const data = await fs.promises.readFile(file.localPath, 'utf8');
-      // const encodedData = Buffer.from(data).toString('base64');
-      res.set('Content-Type', mime.lookup(file.name));
-      res.status(200).sendFile(file.localPath);
     }
   }
 
