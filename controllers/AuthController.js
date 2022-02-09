@@ -31,7 +31,7 @@ class Authorization {
     const [email, password] = authTokenDecoded.split(':');
 
     // check if user exists
-    const hash = createHash('sha256').update(password).digest('hex');
+    const hash = createHash('sha1').update(password).digest('hex');
     const collection = dbClient.db.collection('users');
     const user = await collection.findOne({
       email,
