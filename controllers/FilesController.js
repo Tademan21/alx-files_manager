@@ -238,7 +238,7 @@ class FilesController {
     // Perform query
 
     const query = {
-      userId: user._id,
+      userId: user._id.toString(),
       parentId,
     };
 
