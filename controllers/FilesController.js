@@ -352,10 +352,19 @@ class FilesController {
     const file = await files.findOne({
       _id: ObjectId(id),
     });
-    // throw error if file doesn't exist or no user found and file isn't public
-    // or user doesn't own the file and is not public
-    if (!file || (!user && file.isPublic === false)
-      || (file.isPublic === false && file.userId !== user._id)) {
+    if (!file) {
+      res.status(404).send({
+        error: 'Not found',
+      });
+      return;
+    }
+    if (!user && file.isPublic === false) {
+      res.status(404).send({
+        error: 'Not found',
+      });
+      return;
+    }
+    if (file.isPublic === false && file.userId !== user._id) {
       res.status(404).send({
         error: 'Not found',
       });
