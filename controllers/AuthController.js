@@ -21,16 +21,18 @@ class Authorization {
   static async getConnect(req, res) {
     const authToken = req.headers.authorization;
     if (!authToken) {
-      res.status(401).send({
-        error: 'Missing authorization token',
-      });
+      res.status(401).send({ error: 'Unauthorized' });
       return;
     }
 
     // decode authToken from base64 to utf8 to get email and password
-    const authTokenDecoded = Buffer.from(authToken.split(' ')[1], 'base64').toString('utf8');
+    const authTokenDecoded = Buffer.from(authToken.split(' ')[1],
+      'base64').toString('utf8');
     const [email, password] = authTokenDecoded.split(':');
-
+    if (!email || !password) {
+      res.status(401).send({ error: 'Unauthorized' });
+      return;
+    }
     // check if user exists
     const hash = createHash('sha1').update(password).digest('hex');
     const collection = dbClient.db.collection('users');
@@ -63,9 +65,7 @@ class Authorization {
   static async getDisconnect(req, res) {
     let authToken = req.headers['x-token'];
     if (!authToken) {
-      res.status(401).send({
-        error: 'Missing authorization token',
-      });
+      res.status(401).send({ error: 'Unauthorized' });
       return;
     }
     authToken = `auth_${authToken}`;
