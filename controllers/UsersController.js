@@ -95,7 +95,7 @@ class UsersController {
       return;
     }
     res.status(200).send({
-      id: userDoc._id,
+      id: user,
       email: userDoc.email,
     });
   }
