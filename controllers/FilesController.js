@@ -86,14 +86,14 @@ class FilesController {
     const newFile = {
       name,
       type,
-      parentId: parentId || 0,
+      parentId,
       isPublic: isPublic || false,
-      userId: user._id,
+      userId: user._id.toString(),
     };
     if (type === 'folder') {
       const files = dbClient.db.collection('files');
       const result = await files.insertOne(newFile);
-      newFile.id = result._id;
+      newFile.id = result.insertedId;
       delete newFile._id;
       res.setHeader('Content-Type', 'application/json');
       res.status(201).send(newFile);
