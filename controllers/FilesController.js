@@ -94,7 +94,6 @@ class FilesController {
       const files = dbClient.db.collection('files');
       const result = await files.insertOne(newFile);
       newFile.id = result.insertedId;
-      delete newFile._id;
       res.status(201).send(newFile);
     } else {
       const storeFolderPath = env.FOLDER_PATH || '/tmp/files_manager';
@@ -110,10 +109,8 @@ class FilesController {
       // Create directory if not exists
       if (!(await FilesController.pathExists(storeFolderPath))) {
         await fs.mkdir(storeFolderPath, { recursive: true });
-        FilesController.writeToFile(res, filePath, decodedData, newFile);
-      } else {
-        FilesController.writeToFile(res, filePath, decodedData, newFile);
       }
+      FilesController.writeToFile(res, filePath, decodedData, newFile);
     }
   }
 
