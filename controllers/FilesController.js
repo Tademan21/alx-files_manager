@@ -179,8 +179,8 @@ class FilesController {
 
     const files = dbClient.db.collection('files');
     const file = await files.findOne({
-      userId: user._id,
       _id: ObjectId(id),
+      userId: user._id.toString(),
     });
     if (!file) {
       res.status(404).send({
