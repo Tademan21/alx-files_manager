@@ -102,16 +102,13 @@ class FilesController {
       const fileName = uuidv4();
       const filePath = path.join(storeFolderPath, fileName);
 
-      // add key to newFile depending on type
-      if (type === 'file' || type === 'image') {
-        newFile.localPath = filePath;
-      }
+      newFile.localPath = filePath;
       const decodedData = Buffer.from(data, 'base64');
 
       // Create directory if not exists
       const pathExists = await FilesController.pathExists(storeFolderPath);
       if (!pathExists) {
-        await fs.mkdir(storeFolderPath, { recursive: true });
+        await fs.promises.mkdir(storeFolderPath, { recursive: true });
       }
       FilesController.writeToFile(res, filePath, decodedData, newFile);
     }
@@ -125,9 +122,9 @@ class FilesController {
    * @returns {Object} - Express response object
    */
   static async writeToFile(res, filePath, data, newFile) {
-    const file = fs.createWriteStream(filePath);
-    file.write(data);
-    file.end();
+    // write to file
+    await fs.promises.writeFile(filePath, data, 'utf-8');
+
     const files = dbClient.db.collection('files');
     const result = await files.insertOne(newFile);
     const writeResp = {
