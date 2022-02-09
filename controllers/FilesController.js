@@ -341,13 +341,13 @@ class FilesController {
     const {
       id,
     } = req.params;
-    const user = await FilesController.retrieveUserBasedOnToken(req);
     if (!id) {
       res.status(404).send({
         error: 'Not found',
       });
       return;
     }
+    const user = await FilesController.retrieveUserBasedOnToken(req);
     const files = dbClient.db.collection('files');
     const file = await files.findOne({
       _id: ObjectId(id),
@@ -384,16 +384,10 @@ class FilesController {
       });
     } else {
       // read file with fs
-      fs.readFile(file.localPath, 'utf8', (err, data) => {
-        if (err) {
-          res.status(500).send({
-            error: 'Internal server error',
-          });
-        }
-        // const encodedData = Buffer.from(data).toString('base64');
-        res.set('Content-Type', mime.lookup(file.name));
-        res.status(200).send(data);
-      });
+      // const data = await fs.promises.readFile(file.localPath, 'utf8');
+      // const encodedData = Buffer.from(data).toString('base64');
+      res.set('Content-Type', mime.lookup(file.name));
+      res.status(200).sendFile(file.localPath);
     }
   }
 
