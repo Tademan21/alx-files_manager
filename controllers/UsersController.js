@@ -50,7 +50,7 @@ class UsersController {
     }
 
     // Add new user
-    const hash = createHash('sha256').update(password).digest('hex');
+    const hash = createHash('sha1').update(password).digest('hex');
     const newUser = await users.insertOne({
       email,
       password: hash,
