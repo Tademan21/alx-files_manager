@@ -10,7 +10,6 @@ import {
 import path from 'path';
 import mime from 'mime-types';
 import fs from 'fs';
-// import { promisify } from 'util';
 import redisClient from '../utils/redis';
 import dbClient from '../utils/db';
 
@@ -148,7 +147,7 @@ class FilesController {
    * @returns {Object} - Express response object
    */
   static async retrieveUserBasedOnToken(req) {
-    const authToken = req.headers['x-token'];
+    const authToken = req.header('X-Token') || null;
     if (!authToken) return null;
     const token = `auth_${authToken}`;
     const user = await redisClient.get(token);
