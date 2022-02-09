@@ -86,7 +86,7 @@ class FilesController {
     const newFile = {
       name,
       type,
-      parentId,
+      parentId: parentId || 0,
       isPublic: isPublic || false,
       userId: user._id.toString(),
     };
