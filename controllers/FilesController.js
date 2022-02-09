@@ -342,7 +342,7 @@ class FilesController {
       id,
     } = req.params;
     const user = await FilesController.retrieveUserBasedOnToken(req);
-    if (!user) {
+    if (!id) {
       res.status(404).send({
         error: 'Not found',
       });
@@ -350,11 +350,21 @@ class FilesController {
     }
     const files = dbClient.db.collection('files');
     const file = await files.findOne({
-      userId: user._id,
       _id: ObjectId(id),
-      isPublic: false,
     });
     if (!file) {
+      res.status(404).send({
+        error: 'Not found',
+      });
+      return;
+    }
+    if (!user && file.isPublic === false) {
+      res.status(404).send({
+        error: 'Not found',
+      });
+      return;
+    }
+    if (file.isPublic === false && file.userId !== user._id) {
       res.status(404).send({
         error: 'Not found',
       });
