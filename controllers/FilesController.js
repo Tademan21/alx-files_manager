@@ -189,6 +189,7 @@ class FilesController {
     } else {
       file.id = file._id;
       delete file._id;
+      delete file.localPath;
       res.status(200).send(file);
     }
   }
