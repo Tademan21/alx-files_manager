@@ -343,8 +343,8 @@ class FilesController {
     } = req.params;
     const user = await FilesController.retrieveUserBasedOnToken(req);
     if (!user) {
-      res.status(401).send({
-        error: 'Unauthorized',
+      res.status(404).send({
+        error: 'Not found',
       });
       return;
     }
@@ -352,8 +352,9 @@ class FilesController {
     const file = await files.findOne({
       userId: user._id,
       _id: ObjectId(id),
+      isPublic: false,
     });
-    if (!file || file.isPublic !== false) {
+    if (!file) {
       res.status(404).send({
         error: 'Not found',
       });
