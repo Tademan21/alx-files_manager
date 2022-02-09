@@ -378,14 +378,14 @@ class FilesController {
     }
 
     // check if file exists
-    const fileExists = await FilesController.fileExists(file.localPath);
-    if (fileExists) {
-      res.set('Content-Type', mime.lookup(file.name));
-      res.status(200).sendFile(file.localPath);
-    } else {
+    if (!(await FilesController.pathExists(file.localPath))) {
       res.status(404).send({
         error: 'Not found',
       });
+    } else {
+      // read file with fs
+      res.set('Content-Type', mime.lookup(file.name));
+      res.status(200).sendFile(file.localPath);
     }
   }
 
