@@ -88,16 +88,16 @@ class UsersController {
     const userDoc = await users.findOne({
       _id: ObjectId(user),
     });
-    if (!userDoc) {
+    if (userDoc) {
+      res.status(200).send({
+        id: user,
+        email: userDoc.email,
+      });
+    } else {
       res.status(401).send({
         error: 'Unauthorized',
       });
-      return;
     }
-    res.status(200).send({
-      id: user,
-      email: userDoc.email,
-    });
   }
 }
 

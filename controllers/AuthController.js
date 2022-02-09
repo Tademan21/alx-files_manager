@@ -37,21 +37,20 @@ class Authorization {
       email,
       password: hash,
     });
-    if (!user) {
+    if (user) {
+      // generate new token
+      const token = uuidv4();
+      const key = `auth_${token}`;
+      const userID = user._id.toString();
+      await redisClient.set(key, userID, (60 * 60 * 24)); // 1 day
+      res.status(200).send({
+        token,
+      });
+    } else {
       res.status(401).send({
         error: 'Unauthorized',
       });
-      return;
     }
-
-    // generate new token
-    const token = uuidv4();
-    const key = `auth_${token}`;
-    const userID = user._id.toString();
-    await redisClient.set(key, userID, (60 * 60 * 24)); // 1 day
-    res.status(200).send({
-      token,
-    });
   }
 
   /**
@@ -70,14 +69,14 @@ class Authorization {
     }
     authToken = `auth_${authToken}`;
     const user = await redisClient.get(authToken);
-    if (!user) {
+    if (user) {
+      await redisClient.del(authToken);
+      res.status(204).send();
+    } else {
       res.status(401).send({
         error: 'Unauthorized',
       });
-      return;
     }
-    await redisClient.del(authToken);
-    res.status(204).send();
   }
 }
 
