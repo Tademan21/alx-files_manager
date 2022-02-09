@@ -215,11 +215,10 @@ class FilesController {
     } = req.query;
     const files = dbClient.db.collection('files');
 
-    // if parentId is not provided
+    // if parentId is not provided retrieve all files
     if (!parentId) {
       const result = await files.find({
         userId: user._id,
-        parentId: 0,
       }).toArray();
       res.status(200).send(result);
       return;
