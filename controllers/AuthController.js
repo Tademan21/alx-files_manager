@@ -61,7 +61,7 @@ class Authorization {
    * @description This method creates a new user
    */
   static async getDisconnect(req, res) {
-    let authToken = req.headers['x-token'];
+    let authToken = req.headers['X-Token'];
     if (!authToken) {
       res.status(401).send({
         error: 'Missing authorization token',
