@@ -215,35 +215,22 @@ class FilesController {
     } = req.query;
     const files = dbClient.db.collection('files');
 
-    // if parentId is not provided retrieve all files
-    if (!parentId) {
-      const result = await files.find({
-        userId: user._id,
-        parentId: 0,
-      }).toArray();
-      res.status(200).send(result);
-      return;
-    }
-    // Check for parent existence depending parent id
-    // const parentFolder = await files.findOne({
-    //   _id: ObjectId(parentId),
-    //   userId: user._id,
-    // });
-    // if (!parentFolder) {
-    //   res.send([]);
-    //   return;
-    // }
-
     // Perform pagination
     const pageSize = 20;
     const skip = ((page || 1) - 1) * pageSize;
 
-    // Perform query
-
-    const query = {
-      userId: user._id,
-      parentId,
-    };
+    // if parentId is not provided retrieve all files
+    let query;
+    if (!parentId) {
+      query = {
+        userId: user._id,
+      };
+    } else {
+      query = {
+        userId: user._id,
+        parentId,
+      };
+    }
 
     // handle pagination using aggregation
     const result = await files.aggregate([
@@ -258,7 +245,7 @@ class FilesController {
       },
     ]).toArray();
 
-    res.send(result);
+    res.status(200).send(result);
   }
 
   /**
