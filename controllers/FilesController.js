@@ -217,17 +217,18 @@ class FilesController {
 
     // Perform pagination
     const pageSize = 20;
-    const skip = ((page || 1) - 1) * pageSize;
+    const pageNumber = page || 1;
+    const skip = (pageNumber - 1) * pageSize;
 
     // if parentId is not provided retrieve all files
     let query;
     if (!parentId) {
       query = {
-        userId: user._id,
+        userId: user._id.toString(),
       };
     } else {
       query = {
-        userId: user._id,
+        userId: user._id.toString(),
         parentId,
       };
     }
