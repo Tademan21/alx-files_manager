@@ -246,7 +246,16 @@ class FilesController {
       },
     ]).toArray();
 
-    res.status(200).send(result);
+    const finalResult = result.map((file) => {
+      const newFile = {
+        ...file,
+        id: file._id,
+      };
+      delete newFile._id;
+      delete newFile.localPath;
+      return newFile;
+    });
+    res.status(200).send(finalResult);
   }
 
   /**
