@@ -10,8 +10,16 @@ import {
 import path from 'path';
 import mime from 'mime-types';
 import fs from 'fs';
+import Queue from 'bull';
 import redisClient from '../utils/redis';
 import dbClient from '../utils/db';
+
+const fileQueue = new Queue('fileQueue', {
+  redis: {
+    host: '127.0.0.1',
+    port: 6379,
+  },
+});
 
 /**
  * @class FilesController
@@ -133,6 +141,12 @@ class FilesController {
     };
     delete writeResp._id;
     delete writeResp.localPath;
+
+    // add to queue to process file thumbnails
+    if (writeResp.type === 'image') {
+      fileQueue.add({ userId: writeResp.userId, fileId: writeResp.id });
+    }
+
     res.setHeader('Content-Type', 'application/json');
     res.status(201).send(writeResp);
   }
@@ -338,6 +352,7 @@ class FilesController {
     const {
       id,
     } = req.params;
+    const { size } = req.query;
     if (!id) {
       res.status(404).send({
         error: 'Not found',
@@ -361,7 +376,7 @@ class FilesController {
       });
       return;
     }
-    if (file.isPublic === false && file.userId !== user._id) {
+    if (file.isPublic === false && file.userId !== user._id.toString()) {
       res.status(404).send({
         error: 'Not found',
       });
@@ -374,15 +389,19 @@ class FilesController {
       return;
     }
 
+    const lookUpPath = size && file.type === 'image'
+      ? `${file.localPath}_${size}`
+      : file.localPath;
+
     // check if file exists
-    if (!(await FilesController.pathExists(file.localPath))) {
+    if (!(await FilesController.pathExists(lookUpPath))) {
       res.status(404).send({
         error: 'Not found',
       });
     } else {
       // read file with fs
       res.set('Content-Type', mime.lookup(file.name));
-      res.status(200).sendFile(file.localPath);
+      res.status(200).sendFile(lookUpPath);
     }
   }
 
