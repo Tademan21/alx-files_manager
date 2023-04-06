@@ -1,6 +1,3 @@
-# alx-files_manager
-A simple platform to upload and view files.
-Inside the folder utils, create a file redis.js that contains the class RedisClient.
 
 RedisClient should have:
 
